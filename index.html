@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+
+    <title>EventMachine-LE by ibc</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>EventMachine-LE</h1>
+        <h2>EventMachine-LE (Live Edition), a &quot;branch&quot; of EventMachine with fixes and more features</h2>
+
+        <section id="downloads">
+          <a href="https://github.com/ibc/EventMachine-LE/zipball/master" class="btn">Download as .zip</a>
+          <a href="https://github.com/ibc/EventMachine-LE/tarball/master" class="btn">Download as .tar.gz</a>
+          <a href="https://github.com/ibc/EventMachine-LE" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
+        </section>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+        <h2>Overview</h2>
+
+<p>EventMachine-LE (Live Edition) is a branch of <a href="http://github.com/eventmachine/eventmachine">EventMachine</a> with fixes and more features.</p>
+
+<h2>What do you mean by "branch"?</h2>
+
+<p>Well, outside the narrower git circles, "fork" has all these negative
+connotations, as in bad feelings after an argument, marriages
+divorcing, nation states splitting after a civil war, people hating
+each other.  This is not at all the point here, so let's call this
+fork a "branch".</p>
+
+<h2>Purpose of this branch</h2>
+
+<p>This branch incorporates interesting pull requests that are not yet
+included in the mainline EventMachine repository.  The maintainers of
+that version prefer to minimize change in order to keep the stability
+with already existing EventMachine deployments, which provides an
+impressive multi-platform base for IPv4 TCP servers (e.g., Web
+servers) that don't need good UDP or IPv6 support.</p>
+
+<p>This dedication to stability is helpful for production use, but can
+also lead to ossification.  The present "Live Edition" or "Leading
+Edge" branch has its focus on supporting a somewhat wider use,
+including new Web servers or protocols beyond the HTTP Web.</p>
+
+<p>To provide even more focus, this branch is currently applying its
+energy towards Linux and Unix/BSD/OSX environments.  Java reactor and
+pure Ruby reactor are for now removed in this branch, and
+Windows/Cygwin support is untested.  This may very well change later,
+once interesting pull requests come in.</p>
+
+<p>EventMachine-LE draws from a number of dormant pull requests on the
+mainline version of EventMachine.  New proposals will also directly
+come to EventMachine-LE and will be included once they are tested.</p>
+
+<p>This is not a "development branch" — we do use EventMachine-LE in production,
+just beyond the focus of mainline EventMachine.</p>
+
+<p>The intention is that EventMachine-LE is always a drop-in replacement
+for EventMachine, just with additional (and fixed) functionality.</p>
+
+<h2>Features and changes</h2>
+
+<p>The list of additions and improvements will grow over time. Currently
+the following features/fixes have been applied in EventMachine-LE:</p>
+
+<ul>
+<li>Full IPv6 support for TCP and UDP, in both server and client mode (<a>cabo</a>).</li>
+<li>Added robustness to datagram sockets, which now can optionally not to get destroyed on the first error by setting <code>EM::Connection#send_error_handling=mode</code> (<a>cabo</a>).</li>
+<li>
+<code>EM::attach_server</code> added (<a href="https://github.com/eventmachine/eventmachine/pull/271">ramonmaruko</a>).</li>
+<li>
+<code>EM::RestartableTimer</code> added (<a href="https://github.com/eventmachine/eventmachine/pull/114">adzap</a>).</li>
+<li>
+<code>EM::get_max_timers</code> and <code>EM::set_max_timers</code> are removed (they still exist but do nothing). This solves the annoying "RuntimeError: max timers exceeded" exception.</li>
+<li>Support for Enumerable in <code>EM::Iterator</code> (<a href="https://github.com/eventmachine/eventmachine/pull/300">fl00r</a>).</li>
+<li>Improvements to <code>EM::Protocols::LineProtocol</code> and have it autoload (<a href="https://github.com/eventmachine/eventmachine/pull/151">gaffneyc</a>).</li>
+<li>
+<code>EM::Protocols::SmtpServer</code>: support multiple messages per one connection and login auth type (<a href="https://github.com/eventmachine/eventmachine/pull/288">bogdan</a>).</li>
+<li>Reimplement <code>EM::Queue</code> to avoid shift/push performance problem (<a href="https://github.com/eventmachine/eventmachine/pull/311">grddev</a>).</li>
+<li>Many code cleanups.</li>
+</ul><h2>Installation</h2>
+
+<p>The Current stable version is eventmachine-le-1.1.0 (published as Ruby Gem), installable via:</p>
+
+<pre>
+gem install eventmachine-le
+</pre>
+
+<p>If you want the beta version (not fully tested) install it by using <code>--pre</code> option:</p>
+
+<pre>
+gem install eventmachine-le --pre
+</pre>
+
+<h2>Usage</h2>
+
+<p>Using EventMachine-LE within your project just requires loading it as follows:</p>
+
+<pre>
+# First load EventMachine-LE.
+require "eventmachine-le"
+
+# NOTE: It does not hurt to call "require 'eventmachine'" later
+# (it has no effect at all).
+
+# Then load any other Ruby Gem depending on EventMachine so it
+# will use EventMachine-LE.
+require "em-udns"
+</pre>
+
+<p>By doing this, you will avoid conflicts with the main EventMachine Gem (if it's also installed).</p>
+
+<h2>Authors</h2>
+
+<p>This branch is mantained by <a href="https://github.com/cabo">Carsten Bormann</a> and <a href="https://github.com/ibc">Iñaki Baz Castillo</a>.</p>
+      </section>
+    </div>
+
+    
+  </body>
+</html>
