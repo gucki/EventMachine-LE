@@ -280,14 +280,48 @@ SslBox_t::~SslBox_t()
 {
 	// Freeing pSSL will also free the associated BIOs, so DON'T free them separately.
 	if (pSSL) {
+		// Handle bidirecional shutdown of ssl connection
 		if (SSL_get_shutdown (pSSL) & SSL_RECEIVED_SHUTDOWN)
 			SSL_shutdown (pSSL);
-		else
-			SSL_clear (pSSL);
+		SSL_clear (pSSL);
 		SSL_free (pSSL);
 	}
 
 	delete Context;
+}
+
+
+
+/***********************
+SslBox_t::Shutdown
+***********************/
+
+bool SslBox_t::Shutdown ()
+{
+	printf("SslBox_t::Shutdown called\n");
+	if (pSSL) {
+		int rc = SSL_shutdown(pSSL);
+		printf("SSL_shutdown: %i\n", rc);
+		if (rc == -1) {
+			int ssl_errno;
+			SSL_get_error(pSSL, ssl_errno);
+			if (ssl_errno == SSL_ERROR_WANT_READ || ssl_errno == SSL_ERROR_WANT_WRITE) {
+				printf("SSL_ERROR_WANT_READ or SSL_ERROR_WANT_WRITE detected\n");
+				rc = 0;
+			}
+		}
+		if (rc == 0) {
+			printf("return pending\n");
+			return false;
+		}
+		if (rc == 1) {
+			printf("return completed\n");
+			return true;
+		}
+		throw std::runtime_error ("SSL shutdown failed");
+	} else {
+		return true;
+	}
 }
 
 

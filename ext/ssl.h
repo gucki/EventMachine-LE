@@ -70,7 +70,7 @@ class SslBox_t
 
 		X509 *GetPeerCert();
 
-		void Shutdown();
+		bool Shutdown();
 
 	protected:
 		SslContext_t *Context;

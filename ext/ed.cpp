@@ -210,7 +210,23 @@ bool EventableDescriptor::ShouldDelete()
 	 * if there is outbound data to write, and only request a close if there is none.
 	 */
 
-	return ((MySocket == INVALID_SOCKET) || bCloseNow || (bCloseAfterWriting && (GetOutboundDataSize() <= 0)));
+	if (MySocket == INVALID_SOCKET)
+		return true;
+
+	if (bCloseNow)
+		return true;
+
+	if (bCloseAfterWriting) {
+		// printf("close pending\n");
+		bool allDataSent = (GetOutboundDataSize() <= 0);
+		bool tlsShutdownCompleted = ShutdownTls();
+		// printf("allDataSent: %i\n", allDataSent);
+		// printf("tlsShutdownCompleted: %i\n", tlsShutdownCompleted);
+	 	if (allDataSent && tlsShutdownCompleted)
+			return true;
+	}
+
+	return false;
 }
 
 
@@ -1136,7 +1152,7 @@ void ConnectionDescriptor::StartTls()
 	if (SslBox)
 		throw std::runtime_error ("SSL/TLS already running on connection");
 
-	printf("Server: %s",(bIsServer)?"true":"false");
+	printf("TLS Server: %s\n",(bIsServer)?"true":"false");
 	SslBox = new SslBox_t (bIsServer, PrivateKeyFilename, CertChainFilename, bSslVerifyPeer, bSslVersion, CipherList, GetBinding());
 	_DispatchCiphertext();
 	#endif
@@ -1146,6 +1162,21 @@ void ConnectionDescriptor::StartTls()
 	#endif
 }
 
+/******************************
+ConnectionDescriptor::ShutdownTls
+******************************/
+
+bool ConnectionDescriptor::ShutdownTls()
+{
+	#ifdef WITH_SSL
+	if (SslBox)
+		return SslBox->Shutdown();
+	#endif
+
+	#ifdef WITHOUT_SSL
+	throw std::runtime_error ("Encryption not available on this event-machine");
+	#endif
+}
 
 /*********************************
 ConnectionDescriptor::SetTlsParms
