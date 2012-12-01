@@ -1136,6 +1136,7 @@ void ConnectionDescriptor::StartTls()
 	if (SslBox)
 		throw std::runtime_error ("SSL/TLS already running on connection");
 
+	printf("Server: %s",(bIsServer)?"true":"false");
 	SslBox = new SslBox_t (bIsServer, PrivateKeyFilename, CertChainFilename, bSslVerifyPeer, bSslVersion, CipherList, GetBinding());
 	_DispatchCiphertext();
 	#endif
