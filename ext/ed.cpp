@@ -1169,8 +1169,7 @@ ConnectionDescriptor::ShutdownTls
 bool ConnectionDescriptor::ShutdownTls()
 {
 	#ifdef WITH_SSL
-	if (SslBox)
-		return SslBox->Shutdown();
+	return SslBox ? SslBox->Shutdown() : true;
 	#endif
 
 	#ifdef WITHOUT_SSL
