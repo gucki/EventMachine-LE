@@ -217,13 +217,15 @@ bool EventableDescriptor::ShouldDelete()
 		return true;
 
 	if (bCloseAfterWriting) {
-		// printf("close pending\n");
-		bool allDataSent = (GetOutboundDataSize() <= 0);
-		bool tlsShutdownCompleted = ShutdownTls();
-		// printf("allDataSent: %i\n", allDataSent);
-		// printf("tlsShutdownCompleted: %i\n", tlsShutdownCompleted);
-	 	if (allDataSent && tlsShutdownCompleted)
-			return true;
+		printf("close pending\n");
+	 	if (GetOutboundDataSize() > 0)
+			return false;
+
+	 	if (!ShutdownTls())
+			return false;
+
+		printf("close ok\n");
+		return true;
 	}
 
 	return false;
@@ -1169,7 +1171,13 @@ ConnectionDescriptor::ShutdownTls
 bool ConnectionDescriptor::ShutdownTls()
 {
 	#ifdef WITH_SSL
-	return SslBox ? SslBox->Shutdown() : true;
+	if (SslBox) {
+		bool r = SslBox->Shutdown();
+		_DispatchCiphertext();
+		return r;
+	} else {
+		return true;
+	}
 	#endif
 
 	#ifdef WITHOUT_SSL
@@ -1260,12 +1268,14 @@ void ConnectionDescriptor::_DispatchCiphertext()
 	char BigBuf [2048];
 	bool did_work;
 
+		printf("_DispatchCiphertext\n");
 	do {
 		did_work = false;
 
 		// try to drain ciphertext
 		while (SslBox->CanGetCiphertext()) {
 			int r = SslBox->GetCiphertext (BigBuf, sizeof(BigBuf));
+			printf("GetCiphertext: %i\n", r);
 			assert (r > 0);
 			_SendRawOutboundData (BigBuf, r);
 			did_work = true;

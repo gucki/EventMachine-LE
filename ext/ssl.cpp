@@ -266,6 +266,7 @@ SslBox_t::SslBox_t (bool is_server, const string &privkeyfile, const string &cer
 	if (bVerifyPeer)
 		SSL_set_verify(pSSL, SSL_VERIFY_PEER | SSL_VERIFY_CLIENT_ONCE, ssl_verify_wrapper);
 
+	printf("TLS Server1: %s\n",(bIsServer)?"true":"false");
 	if (!bIsServer)
 		SSL_connect (pSSL);
 }
